@@ -12,7 +12,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(BASE_DIR, "data"))
 UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
-DATABASE = os.path.join(DATA_DIR, "kmpe.db")
+DATABASE = os.path.join(DATA_DIR, "bagc.db")
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -107,17 +107,42 @@ def init_database():
         enabled INTEGER DEFAULT 1,
         created_at TEXT NOT NULL
     )""")
-    # Normalize older service tables created by previous website versions.
+    # Service photos and client logo management.
     service_columns = {row[1] for row in db.execute("PRAGMA table_info(services)").fetchall()}
     for column, definition in (("title", "TEXT"), ("description", "TEXT DEFAULT ''"), ("icon", "TEXT DEFAULT ''"), ("enabled", "INTEGER DEFAULT 1"), ("created_at", "TEXT DEFAULT ''")):
         if column not in service_columns:
             db.execute(f"ALTER TABLE services ADD COLUMN {column} {definition}")
     service_columns = {row[1] for row in db.execute("PRAGMA table_info(services)").fetchall()}
+    if "image_filename" not in service_columns:
+        db.execute("ALTER TABLE services ADD COLUMN image_filename TEXT DEFAULT ''")
+    db.execute("CREATE TABLE IF NOT EXISTS clients (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, website TEXT DEFAULT '', logo_filename TEXT DEFAULT '', logo_url TEXT DEFAULT '', enabled INTEGER DEFAULT 1, created_at TEXT NOT NULL)")
+    client_count = db.execute("SELECT COUNT(*) FROM clients").fetchone()[0]
+    if client_count == 0:
+        seed_clients = [
+          ("የቤቶች ልማት ኮርፖሬሽን", "https://aahdc.gov.et/", "https://tnt-constructions.com/wp-content/uploads/2024/02/addis-ababa-betoch-lemat.png"),
+          ("Prosperity Party", "https://prosperity.org.et/?page_id=150&lang=en", "https://tnt-constructions.com/wp-content/uploads/2024/01/Untitled-2.png"),
+          ("Ministry of Education", "https://moe.gov.et/", "https://tnt-constructions.com/wp-content/uploads/2024/01/download-1-1.png"),
+          ("Addis Ababa Road and Transport Office", "https://cityaddisababa.gov.et/en/office/road-and-transport-office", "https://tnt-constructions.com/wp-content/uploads/2024/01/W6r-mSH-_400x400.jpg"),
+          ("Arba Minch University", "https://www.amu.edu.et/", "https://tnt-constructions.com/wp-content/uploads/2024/01/Arba_Minch_University.png"),
+          ("Debre Berhan University", "https://www.dbu.edu.et/", "https://tnt-constructions.com/wp-content/uploads/2024/01/download.png"),
+          ("Ambo University", "https://ambou.edu.et/", "https://tnt-constructions.com/wp-content/uploads/2024/01/Untitled-4.png"),
+          ("Ethiopian Sugar Corporation", "https://etsugar.com/", "https://tnt-constructions.com/wp-content/uploads/2024/01/Untitled-1.png")]
+        db.executemany("INSERT INTO clients(name,website,logo_url,created_at) VALUES(?,?,?,?)", [(n,w,u,datetime.now().isoformat(timespec='seconds')) for n,w,u in seed_clients])
     if "name" in service_columns:
         db.execute("UPDATE services SET title=name WHERE title IS NULL OR trim(title)=''")
     if "category" in service_columns:
         db.execute("UPDATE services SET title=category WHERE title IS NULL OR trim(title)=''")
     db.execute("UPDATE services SET title='Service' WHERE title IS NULL OR trim(title)=''")
+    if db.execute("SELECT COUNT(*) FROM services").fetchone()[0] == 0:
+        default_services = [
+          ("Building", "Building construction, structural works and finishing for residential, commercial and public facilities."),
+          ("Roads", "Road construction, rehabilitation, drainage, earthworks and road maintenance."),
+          ("Canals", "Canal construction and water conveyance infrastructure."),
+          ("Bridges", "Bridge and culvert construction for reliable transport connections."),
+          ("Urban Corridor Developments", "Integrated urban corridor, streetscape, transport and public-realm development."),
+          ("Water Treatments", "Water treatment facilities and supporting water infrastructure."),
+          ("Community Services", "Construction and community-focused infrastructure services that improve local facilities.")]
+        db.executemany("INSERT INTO services(title,description,icon,enabled,created_at,image_filename) VALUES(?,?, '',1,?,'')", [(n,d,datetime.now().isoformat(timespec='seconds')) for n,d in default_services])
     db.execute("UPDATE services SET created_at=? WHERE created_at IS NULL OR trim(created_at)=''", (now(),))
     defaults = {
         "about_heading": "About Birhanu Abebe General Contractor",
@@ -284,6 +309,7 @@ def home():
     projects = all_projects[:12]
     news = enrich_gallery(db.execute("SELECT * FROM news WHERE published=1 ORDER BY id DESC LIMIT 3").fetchall())
     services = public_services()
+    clients = db.execute("SELECT * FROM clients WHERE enabled=1 ORDER BY id").fetchall()
     vacancies = db.execute("SELECT * FROM vacancies WHERE published=1 ORDER BY id DESC LIMIT 3").fetchall()
     settings = public_settings()
     slides = []
@@ -294,7 +320,7 @@ def home():
             continue
         for photo in project["gallery"]:
             slides.append({"filename": photo, "title": project["title"], "description": project["description"], "status": "Completed"})
-    return render_template("home.html", projects=projects, news=news, vacancies=vacancies, settings=settings, services=services, slides=slides[:48])
+    return render_template("home.html", projects=projects, news=news, vacancies=vacancies, settings=settings, services=services, clients=clients, slides=slides[:48])
 
 
 @app.route("/about")
@@ -489,12 +515,13 @@ def admin_dashboard():
     projects = enrich_gallery(db.execute("SELECT * FROM projects ORDER BY id DESC").fetchall())
     news = enrich_gallery(db.execute("SELECT * FROM news ORDER BY id DESC").fetchall())
     services = db.execute("SELECT * FROM services ORDER BY id").fetchall()
+    clients = db.execute("SELECT * FROM clients ORDER BY id").fetchall()
     vacancies = db.execute("SELECT * FROM vacancies ORDER BY id DESC").fetchall()
     messages = db.execute("SELECT * FROM messages ORDER BY id DESC").fetchall()
     applications = db.execute("SELECT applications.*, vacancies.title AS vacancy_title FROM applications LEFT JOIN vacancies ON vacancies.id=applications.vacancy_id ORDER BY applications.id DESC").fetchall()
     settings = {r["setting_key"]: r["setting_value"] for r in db.execute("SELECT setting_key,setting_value FROM settings").fetchall()}
     unread_messages = db.execute("SELECT COUNT(*) FROM messages WHERE is_read=0").fetchone()[0]
-    return render_template("admin.html", projects=projects, news=news, vacancies=vacancies, messages=messages, applications=applications, settings=settings, unread_messages=unread_messages, services=services)
+    return render_template("admin.html", projects=projects, news=news, vacancies=vacancies, messages=messages, applications=applications, settings=settings, unread_messages=unread_messages, services=services, clients=clients)
 
 
 @app.route("/admin/projects/add", methods=["POST"])
@@ -631,11 +658,13 @@ def add_service():
     description = request.form.get("description", "").strip()
     icon = ""
     enabled = 1 if request.form.get("enabled") else 0
+    image_file = request.files.get("service_image")
+    image_filename = save_uploaded_image(image_file) if image_file and image_file.filename else ""
     if not title:
         flash("Service name is required.", "error")
         return redirect(url_for("admin_dashboard") + "#services-admin")
     db = get_db()
-    db.execute("INSERT INTO services(title,description,icon,enabled,created_at) VALUES(?,?,?,?,?)", (title, description, icon, enabled, now()))
+    db.execute("INSERT INTO services(title,description,icon,enabled,created_at,image_filename) VALUES(?,?,?,?,?,?)", (title, description, icon, enabled, now(), image_filename))
     db.commit()
     flash("Service added. If enabled, it is now shown on the public website.", "success")
     return redirect(url_for("admin_dashboard") + "#services-admin")
@@ -660,6 +689,30 @@ def delete_service(service_id):
     flash("Service deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#services-admin")
 
+
+@app.route("/admin/clients/add", methods=["POST"])
+@admin_required
+def add_client():
+    name = request.form.get("name", "").strip()
+    website = request.form.get("website", "").strip()
+    logo_url = request.form.get("logo_url", "").strip()
+    logo = request.files.get("client_logo")
+    logo_filename = save_uploaded_image(logo) if logo and logo.filename else ""
+    if not name:
+        flash("Client company name is required.", "error")
+    else:
+        get_db().execute("INSERT INTO clients(name,website,logo_filename,logo_url,created_at) VALUES(?,?,?,?,?)", (name, website, logo_filename, logo_url, now()))
+        get_db().commit()
+        flash("Client company added.", "success")
+    return redirect(url_for("admin_dashboard") + "#clients-admin")
+
+@app.route("/admin/clients/delete/<int:client_id>", methods=["POST"])
+@admin_required
+def delete_client(client_id):
+    get_db().execute("DELETE FROM clients WHERE id=?", (client_id,))
+    get_db().commit()
+    flash("Client company removed.", "success")
+    return redirect(url_for("admin_dashboard") + "#clients-admin")
 
 @app.route("/health")
 def health():

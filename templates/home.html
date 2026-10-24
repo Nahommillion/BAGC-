@@ -30,8 +30,13 @@
 </section>
 <section class="marquee home-marquee"><div class="marquee-track">FOUNTAIN WORKS &nbsp; FINISHING WORKS &nbsp; CONSTRUCTION SOLUTIONS &nbsp; QUALITY &nbsp; CRAFTSMANSHIP &nbsp; BIRHANU ABEBE GENERAL CONTRACTOR &nbsp; </div></section>
 
-<section class="section-pad company-project-types"><div class="container"><div class="section-heading centered"><div class="eyebrow"><span></span> OUR COMPANY PROJECT</div><h2>The Project Life Cycle of a <em>Constructed Facility</em></h2><p>From planning and construction to delivery and maintenance, BAGC supports essential infrastructure and building projects.</p></div><div class="service-grid"><article class="service-card"><div class="service-icon">🏢</div><h3>Building Project</h3><p>A building project brings together coordinated design, construction and finishing processes to deliver safe, functional facilities.</p><a href="{{ url_for('projects_page') }}">More about →</a></article><article class="service-card"><div class="service-icon">🛣️</div><h3>Road Project</h3><p>Road construction and maintenance, including bridges, culverts, embankments and related civil infrastructure.</p><a href="{{ url_for('projects_page') }}">More about →</a></article><article class="service-card"><div class="service-icon">💧</div><h3>Water Treatment</h3><p>Water infrastructure and treatment projects that support communities, public services and sustainable development.</p><a href="{{ url_for('projects_page') }}">More about →</a></article></div></div></section>
-
+<section class="section-pad company-project-types" id="services">
+  <div class="container"><div class="section-heading centered"><div class="eyebrow"><span></span> OUR COMPANY PROJECTS</div><h2>The Project Life Cycle of a <em>Constructed Facility</em></h2><p>We deliver construction and infrastructure services that support communities and national development.</p></div>
+    <div class="service-grid service-photo-grid">
+    {% for service in services %}<article class="service-card service-photo-card"><a class="service-photo" href="{{ url_for('service_detail', service_id=service.id) }}">{% if service.image_filename %}<img src="{{ url_for('uploaded_file', filename=service.image_filename) }}" alt="{{ service.title }}">{% else %}<img src="{{ url_for('static', filename='images/construction.svg' if loop.index in [1,2,3,4] else 'images/hero.svg') }}" alt="{{ service.title }}">{% endif %}</a><h3>{{ service.title }}</h3><p>{{ service.description or 'Professional construction services delivered with quality, safety and responsibility.' }}</p><a href="{{ url_for('service_detail', service_id=service.id) }}">More about →</a></article>{% endfor %}
+    </div>
+  </div>
+</section>
 <section class="focus-gallery-section section-pad home-project-gallery">
   <div class="container">
     <div class="section-heading split">
@@ -85,5 +90,7 @@
     <div class="page-cta"><a class="btn btn-ghost" href="{{ url_for('news_page') }}">View All News</a></div>
   </div>
 </section>
+<section class="section-pad company-stats-section"><div class="container"><div class="stats-grid"><div><strong>+2005</strong><span>Year Established</span></div><div><strong>+15</strong><span>Ongoing Projects</span></div><div><strong>+20</strong><span>Outgoing Projects</span></div></div></div></section>
+<section class="section-pad clients-section"><div class="container"><div class="section-heading centered"><div class="eyebrow"><span></span> CLIENTS COMPANY</div><h2>Our <em>Clients</em></h2><p>Organizations and institutions we work with and serve.</p><div class="client-count">+100 <span>Client Companies</span></div></div><div class="clients-grid">{% for client in clients %}<a class="client-card" href="{{ client.website or '#' }}" target="_blank" rel="noopener"><div class="client-logo">{% if client.logo_filename %}<img src="{{ url_for('uploaded_file', filename=client.logo_filename) }}" alt="{{ client.name }}">{% elif client.logo_url %}<img src="{{ client.logo_url }}" alt="{{ client.name }}" loading="lazy">{% else %}<span>{{ client.name }}</span>{% endif %}</div><span>{{ client.name }}</span></a>{% endfor %}</div></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ url_for('static', filename='js/carousel.js') }}"></script>{% endblock %}
