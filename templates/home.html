@@ -28,7 +28,7 @@
   </div>
   <div class="scroll-cue"><span></span> SCROLL TO EXPLORE</div>
 </section>
-<section class="marquee home-marquee"><div class="marquee-track">FOUNTAIN WORKS &nbsp; FINISHING WORKS &nbsp; CONSTRUCTION SOLUTIONS &nbsp; QUALITY &nbsp; CRAFTSMANSHIP &nbsp; BIRHANU ABEBE GENERAL CONTRACTOR &nbsp; </div></section>
+<section class="marquee home-marquee" aria-label="Our services and social links"><div class="marquee-track">{% for service in services %}<span>{{ service.title|e|upper }}</span><span aria-hidden="true"> · </span>{% endfor %}<span>BUILDING CONSTRUCTION</span><span> · </span><span>ROAD WORKS</span><span> · </span><span>CANALS &amp; BRIDGES</span><span> · </span><span>URBAN CORRIDOR DEVELOPMENT</span><span> · </span><span>WATER TREATMENT</span><span> · </span><span>COMMUNITY SERVICES</span><span> · </span><a href="{{ settings.get('social_facebook') or 'https://web.facebook.com/profile.php?id=61584783661599' }}" target="_blank" rel="noopener noreferrer">FACEBOOK</a><span> · </span><a href="{{ settings.get('social_telegram') or 'https://t.me/BirhanuabebeGc' }}" target="_blank" rel="noopener noreferrer">TELEGRAM</a><span> · </span><span>QUALITY · SAFETY · CRAFTSMANSHIP · BIRHANU ABEBE GENERAL CONTRACTOR</span></div></section>
 
 <section class="section-pad company-project-types" id="services">
   <div class="container"><div class="section-heading centered"><div class="eyebrow"><span></span> OUR COMPANY PROJECTS</div><h2>The Project Life Cycle of a <em>Constructed Facility</em></h2><p>We deliver construction and infrastructure services that support communities and national development.</p></div>

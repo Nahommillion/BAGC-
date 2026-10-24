@@ -164,7 +164,7 @@ def init_database():
         "service2_title": "Finishing Works", "service2_text": "Interior and exterior finishing activities with attention to clean workmanship and detail.",
         "service3_title": "Construction Works", "service3_text": "General construction and civil works delivered with organized execution and quality control.",
         "service4_title": "Special Works", "service4_text": "Additional construction activities tailored to client needs.",
-        "social_facebook": "", "social_instagram": "", "social_linkedin": "", "social_telegram": "", "social_youtube": "", "social_tiktok": "", "logo_filename": "", "office_image": "", "stat_year": "+2005", "stat_ongoing": "+15", "stat_outgoing": "+20"
+        "social_facebook": "https://web.facebook.com/profile.php?id=61584783661599", "social_instagram": "", "social_linkedin": "", "social_telegram": "https://t.me/BirhanuabebeGc", "social_youtube": "", "social_tiktok": "", "logo_filename": "", "office_image": "", "stat_year": "+2005", "stat_ongoing": "+15", "stat_outgoing": "+20"
     }
     for key, value in defaults.items():
         db.execute("INSERT OR IGNORE INTO settings(setting_key,setting_value) VALUES(?,?)", (key, value))
