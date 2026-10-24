@@ -1,0 +1,89 @@
+{% extends "public_base.html" %}
+{% block title %}BIRHANU ABEBE GENERAL CONTRACTOR | Construction & Finishing{% endblock %}
+{% block page_content %}
+<section class="hero section-pad home-hero home-brand-visual">
+  <div class="hero-grid container">
+    <div class="hero-copy">
+      <div class="eyebrow"><span></span> BIRHANU ABEBE GENERAL CONTRACTOR · GENERAL CONTRACTOR</div>
+      <h1>{{ settings.get('hero_heading', 'Building spaces that leave a mark.') }}</h1>
+      <p class="hero-text">{{ settings.get('hero_text', 'Building construction, road works, water treatment and civil engineering delivered with quality and responsibility.') }}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{ url_for('services_page') }}">Explore Services <span>↗</span></a>
+        <a class="btn btn-ghost" href="{{ url_for('projects_page') }}">View Projects</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>{{ slides|length }}</strong><span>Project<br>Photos</span></div>
+        <div><strong>{{ services|length }}</strong><span>Service<br>Areas</span></div>
+        <div><strong>Quality</strong><span>In every<br>detail</span></div>
+      </div>
+    </div>
+    <div class="hero-visual reveal reveal-delay">
+      <div class="hero-frame">
+        <img src="{{ url_for('static', filename='images/hero.svg') }}" alt="BIRHANU ABEBE GENERAL CONTRACTOR construction and finishing visual">
+        <div class="hero-badge badge-one"><span>Built with purpose</span></div>
+        <div class="hero-badge badge-two"><span>Designed to impress</span></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span></span> SCROLL TO EXPLORE</div>
+</section>
+<section class="marquee home-marquee"><div class="marquee-track">FOUNTAIN WORKS &nbsp; FINISHING WORKS &nbsp; CONSTRUCTION SOLUTIONS &nbsp; QUALITY &nbsp; CRAFTSMANSHIP &nbsp; BIRHANU ABEBE GENERAL CONTRACTOR &nbsp; </div></section>
+
+<section class="section-pad company-project-types"><div class="container"><div class="section-heading centered"><div class="eyebrow"><span></span> OUR COMPANY PROJECT</div><h2>The Project Life Cycle of a <em>Constructed Facility</em></h2><p>From planning and construction to delivery and maintenance, BAGC supports essential infrastructure and building projects.</p></div><div class="service-grid"><article class="service-card"><div class="service-icon">🏢</div><h3>Building Project</h3><p>A building project brings together coordinated design, construction and finishing processes to deliver safe, functional facilities.</p><a href="{{ url_for('projects_page') }}">More about →</a></article><article class="service-card"><div class="service-icon">🛣️</div><h3>Road Project</h3><p>Road construction and maintenance, including bridges, culverts, embankments and related civil infrastructure.</p><a href="{{ url_for('projects_page') }}">More about →</a></article><article class="service-card"><div class="service-icon">💧</div><h3>Water Treatment</h3><p>Water infrastructure and treatment projects that support communities, public services and sustainable development.</p><a href="{{ url_for('projects_page') }}">More about →</a></article></div></div></section>
+
+<section class="focus-gallery-section section-pad home-project-gallery">
+  <div class="container">
+    <div class="section-heading split">
+      <div><div class="eyebrow"><span></span> BIRHANU ABEBE GENERAL CONTRACTOR PROJECT PORTFOLIO</div><h2>Our Company <em>Projects.</em></h2></div>
+      <p>Project photographs change automatically. Completed project images uploaded through the admin panel appear here.</p>
+    </div>
+    <div class="focus-gallery hero-carousel" data-carousel aria-label="Completed project photo slideshow">
+      {% if slides %}
+        {% for slide in slides %}
+          <a class="hero-slide {% if loop.first %}active{% endif %}" href="{{ url_for('projects_page', status='Completed') }}">
+            <img src="{{ url_for('uploaded_file', filename=slide.filename) }}" alt="{{ slide.title }}" loading="{% if loop.first %}eager{% else %}lazy{% endif %}">
+            <div class="slide-caption"><span>Completed Project</span><strong>{{ slide.title }}</strong>{% if slide.description %}<p>{{ slide.description }}</p>{% endif %}</div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="hero-slide active"><img src="{{ url_for('static', filename='images/hero.svg') }}" alt="BIRHANU ABEBE GENERAL CONTRACTOR project gallery"><div class="slide-caption"><span>Our work in focus</span><strong>Completed project gallery</strong><p>Upload project photographs and mark the project Completed to display it here.</p></div></div>
+      {% endif %}
+      <button class="carousel-arrow prev" type="button" aria-label="Previous project image">‹</button>
+      <button class="carousel-arrow next" type="button" aria-label="Next project image">›</button>
+      <div class="carousel-dots"></div>
+    </div>
+    <div class="page-cta"><a class="btn btn-ghost" href="{{ url_for('projects_page', status='Completed') }}">View Completed Projects</a></div>
+  </div>
+</section>
+
+<section class="section-pad home-about-section">
+  <div class="container two-col">
+    <div class="section-heading"><div class="eyebrow"><span></span> ABOUT BIRHANU ABEBE GENERAL CONTRACTOR</div><h2>{{ settings.get('about_heading', 'Welcome to BIRHANU ABEBE GENERAL CONTRACTOR') }}</h2></div>
+    <div class="about-copy">
+      <p>{{ settings.get('about_text', 'BIRHANU ABEBE GENERAL CONTRACTOR is an Ethiopian construction company focused on fountain works, finishing works and construction solutions. Since its establishment, the company has worked to deliver reliable workmanship and contribute to quality built environments.') }}</p>
+      {% if settings.get('about_extra') %}<p>{{ settings.get('about_extra') }}</p>{% endif %}
+      <a class="btn btn-primary home-read-more" href="{{ url_for('about_page') }}">Read More <span>↗</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad news-section home-recent-news">
+  <div class="container">
+    <div class="section-heading split"><div><div class="eyebrow"><span></span> RECENT NEWS ARTICLE</div><h2>Recent <em>news.</em></h2></div><p>Company announcements, project milestones and updates published by BIRHANU ABEBE GENERAL CONTRACTOR.</p></div>
+    <div class="news-grid">
+      {% for item in news %}
+        <article class="news-card">
+          <a class="news-image" href="{{ url_for('news_detail', news_id=item.id) }}">
+            {% if item.gallery %}<img src="{{ url_for('uploaded_file', filename=item.gallery[0]) }}" alt="{{ item.title }}" loading="lazy">
+            {% else %}<div class="news-placeholder">BIRHANU ABEBE GENERAL CONTRACTOR</div>{% endif %}
+          </a>
+          <div class="news-body"><div class="date">{{ (item.created_at or '')[:10] }}</div><h3><a href="{{ url_for('news_detail', news_id=item.id) }}">{{ item.title }}</a></h3><p>{{ (item.content or '')[:280] }}{% if (item.content or '')|length > 280 %}…{% endif %}</p><a href="{{ url_for('news_detail', news_id=item.id) }}">Continue Reading →</a></div>
+        </article>
+      {% else %}<p>Published news articles, photographs and descriptions will appear here when added through the admin panel.</p>{% endfor %}
+    </div>
+    <div class="page-cta"><a class="btn btn-ghost" href="{{ url_for('news_page') }}">View All News</a></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/carousel.js') }}"></script>{% endblock %}
