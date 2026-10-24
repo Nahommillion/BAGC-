@@ -5,8 +5,8 @@
 <header class="site-header" id="top">
   <div class="container nav-wrap">
     <a class="brand" href="#top" aria-label="BIRHANU ABEBE GENERAL CONTRACTOR home">
-      <span class="brand-mark">K</span>
-      <span><strong>BAGC</strong><small>PLC</small></span>
+      <img class="brand-logo" src="{{ url_for('static', filename='images/bagc-logo.jpg') }}" alt="BAGC logo">
+      <span><strong>BAGC</strong><small>GENERAL CONTRACTOR</small></span>
     </a>
     <button class="menu-toggle" aria-label="Open menu"></button>
     <nav class="nav-links">
@@ -112,13 +112,13 @@
       {% if news %}
         {% for item in news %}
         <article class="news-card reveal">
-          <div class="news-image">{% if item.gallery %}<img src="{{ url_for('uploaded_file', filename=item.gallery[0]) }}" alt="{{ item.title }}">{% else %}<div class="news-placeholder">BAGC<br>PLC</div>{% endif %}</div>
+          <div class="news-image">{% if item.gallery %}<img src="{{ url_for('uploaded_file', filename=item.gallery[0]) }}" alt="{{ item.title }}">{% else %}<div class="news-placeholder">BAGC<br>GENERAL CONTRACTOR</div>{% endif %}</div>
           {% if item.gallery|length > 1 %}<div class="project-thumbs">{% for photo in item.gallery %}<a href="{{ url_for('uploaded_file', filename=photo) }}" target="_blank" title="Open news photo {{ loop.index }}"><img src="{{ url_for('uploaded_file', filename=photo) }}" alt="{{ item.title }} photo {{ loop.index }}"></a>{% endfor %}</div>{% endif %}
           <div class="news-body"><div class="date">{{ item.created_at[:10] }}</div><h3>{{ item.title }}</h3><p>{{ item.content[:180] }}{% if item.content|length > 180 %}…{% endif %}</p></div>
         </article>
         {% endfor %}
       {% else %}
-        <article class="news-card reveal"><div class="news-image"><div class="news-placeholder">BAGC<br>PLC</div></div><div class="news-body"><div class="date">LATEST</div><h3>Your company news will appear here.</h3><p>Use the private admin panel to publish announcements and project updates.</p></div></article>
+        <article class="news-card reveal"><div class="news-image"><div class="news-placeholder">BAGC<br>GENERAL CONTRACTOR</div></div><div class="news-body"><div class="date">LATEST</div><h3>Your company news will appear here.</h3><p>Use the private admin panel to publish announcements and project updates.</p></div></article>
       {% endif %}
     </div>
   </div>
@@ -147,7 +147,7 @@
 </section>
 </main>
 
-<footer class="footer"><div class="container footer-grid"><div><a class="brand" href="#top"><span class="brand-mark">K</span><span><strong>BAGC</strong><small>PLC</small></span></a><p>Construction · Fountain Works · Finishing Works</p></div><div class="footer-links"><a href="#about">About</a><a href="#services">Services</a><a href="#projects">Projects</a><a href="#news">News</a><a href="#vacancies">Vacancies</a><a href="#contact">Contact</a></div></div><div class="container footer-social">{% for key,label,icon in [('social_facebook','Facebook',''),('social_instagram','Instagram',''),('social_linkedin','LinkedIn',''),('social_telegram','Telegram',''),('social_youtube','YouTube','▶️'),('social_tiktok','TikTok','')] %}{% if settings.get(key) %}<a href="{{ settings.get(key) }}" target="_blank" rel="noopener noreferrer">{{ icon }} {{ label }}</a>{% endif %}{% endfor %}</div><div class="container footer-bottom"><span>© {{ current_year }} BIRHANU ABEBE GENERAL CONTRACTOR. All rights reserved.</span><span>Designed for a modern construction company.</span></div></footer>
+<footer class="footer"><div class="container footer-grid"><div><a class="brand" href="#top"><img class="brand-logo" src="{{ url_for('static', filename='images/bagc-logo.jpg') }}" alt="BAGC logo"><span><strong>BAGC</strong><small>GENERAL CONTRACTOR</small></span></a><p>Building · Roads · Canals · Bridges · Urban Corridors · Water Treatment · Community Services</p></div><div class="footer-links"><a href="#about">About</a><a href="#services">Services</a><a href="#projects">Projects</a><a href="#news">News</a><a href="#vacancies">Vacancies</a><a href="#contact">Contact</a></div></div><div class="container footer-social">{% for key,label,icon in [('social_facebook','Facebook',''),('social_instagram','Instagram',''),('social_linkedin','LinkedIn',''),('social_telegram','Telegram',''),('social_youtube','YouTube','▶️'),('social_tiktok','TikTok','')] %}{% if settings.get(key) %}<a href="{{ settings.get(key) }}" target="_blank" rel="noopener noreferrer">{{ icon }} {{ label }}</a>{% endif %}{% endfor %}</div><div class="container footer-bottom"><span>© {{ current_year }} BIRHANU ABEBE GENERAL CONTRACTOR. All rights reserved.</span><span>Designed for a modern construction company.</span></div></footer>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}<div class="toast-stack">{% for category, message in messages %}<div class="toast {{ category }}">{{ message }}<button onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}

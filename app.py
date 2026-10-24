@@ -164,7 +164,7 @@ def init_database():
         "service2_title": "Finishing Works", "service2_text": "Interior and exterior finishing activities with attention to clean workmanship and detail.",
         "service3_title": "Construction Works", "service3_text": "General construction and civil works delivered with organized execution and quality control.",
         "service4_title": "Special Works", "service4_text": "Additional construction activities tailored to client needs.",
-        "social_facebook": "", "social_instagram": "", "social_linkedin": "", "social_telegram": "", "social_youtube": "", "social_tiktok": "", "logo_filename": "", "office_image": ""
+        "social_facebook": "", "social_instagram": "", "social_linkedin": "", "social_telegram": "", "social_youtube": "", "social_tiktok": "", "logo_filename": "", "office_image": "", "stat_year": "+2005", "stat_ongoing": "+15", "stat_outgoing": "+20"
     }
     for key, value in defaults.items():
         db.execute("INSERT OR IGNORE INTO settings(setting_key,setting_value) VALUES(?,?)", (key, value))
@@ -459,7 +459,7 @@ def admin_login():
 @app.route("/admin/site-content", methods=["POST"])
 @admin_required
 def save_site_content():
-    keys = ["hero_heading", "hero_text", "about_heading", "about_text", "about_extra", "vision_heading", "vision_text", "mission_heading", "mission_text", "values_heading", "values_text", "tender_heading", "tender_text", "service1_title", "service1_text", "service2_title", "service2_text", "service3_title", "service3_text", "service4_title", "service4_text", "contact_heading", "contact_text", "contact_location", "contact_email", "contact_phone", "social_facebook", "social_instagram", "social_linkedin", "social_telegram", "social_youtube", "social_tiktok"]
+    keys = ["hero_heading", "hero_text", "about_heading", "about_text", "about_extra", "vision_heading", "vision_text", "mission_heading", "mission_text", "values_heading", "values_text", "tender_heading", "tender_text", "service1_title", "service1_text", "service2_title", "service2_text", "service3_title", "service3_text", "service4_title", "service4_text", "contact_heading", "contact_text", "contact_location", "contact_email", "contact_phone", "social_facebook", "social_instagram", "social_linkedin", "social_telegram", "social_youtube", "social_tiktok", "stat_year", "stat_ongoing", "stat_outgoing"]
     db = get_db()
     logo = request.files.get("logo")
     office_image = request.files.get("office_image")
@@ -667,6 +667,31 @@ def add_service():
     db.execute("INSERT INTO services(title,description,icon,enabled,created_at,image_filename) VALUES(?,?,?,?,?,?)", (title, description, icon, enabled, now(), image_filename))
     db.commit()
     flash("Service added. If enabled, it is now shown on the public website.", "success")
+    return redirect(url_for("admin_dashboard") + "#services-admin")
+
+
+@app.route("/admin/services/edit/<int:service_id>", methods=["POST"])
+@admin_required
+def edit_service(service_id):
+    db = get_db()
+    row = db.execute("SELECT * FROM services WHERE id=?", (service_id,)).fetchone()
+    if not row:
+        flash("Service category not found.", "error")
+        return redirect(url_for("admin_dashboard") + "#services-admin")
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    image_file = request.files.get("service_image")
+    image_filename = row["image_filename"] if "image_filename" in row.keys() else ""
+    if image_file and image_file.filename:
+        uploaded = save_uploaded_image(image_file)
+        if uploaded:
+            image_filename = uploaded
+    if not title:
+        flash("Service name is required.", "error")
+        return redirect(url_for("admin_dashboard") + "#services-admin")
+    db.execute("UPDATE services SET title=?, description=?, image_filename=? WHERE id=?", (title, description, image_filename or "", service_id))
+    db.commit()
+    flash("Service details and representative image updated.", "success")
     return redirect(url_for("admin_dashboard") + "#services-admin")
 
 
